@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bab V: Logika Predikat — Kuis Interaktif &amp; Simulator Kuantor</title>
+  <style>
+    :root {
+      --primary: #1B4332;
+      --primary-dark: #122E22;
+      --primary-mid: #2D6A4F;
+      --amber: #F2B705;
+      --amber-soft: #FFFBEB;
+      --terakota: #D96B43;
+      --terakota-soft: #FDF2F0;
+      --sage-bg: #F2F7F4;
+      --ink: #1E293B;
+      --muted: #52635A;
+      --border: #D5E3DB;
+      --ok: #15803D;
+      --ok-bg: #ECFDF3;
+      --bad: #B91C1C;
+      --bad-bg: #FEF2F2;
+      --white: #FFFFFF;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(180deg, #EAF2ED 0%, #F7FAF8 100%);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 16px 14px 44px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      background: var(--white);
+      color: var(--primary);
+      border: 1.5px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      transition: all 0.16s ease;
+    }
+    .back-btn:hover {
+      border-color: var(--primary);
+      background: var(--sage-bg);
+    }
+    .top-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      border-radius: var(--radius);
+      padding: 20px 22px 18px;
+      border-bottom: 4px solid var(--amber);
+      box-shadow: 0 10px 26px rgba(27, 67, 50, 0.18);
+      margin-bottom: 16px;
+    }
+    .hero-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .pill {
+      background: var(--amber);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.74rem;
+      letter-spacing: 0.06em;
+      padding: 3px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .hero-course {
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      color: #D8EAE0;
+      font-weight: 600;
+    }
+    .hero h1 {
+      margin: 0 0 4px;
+      font-size: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+    .hero p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: #E2F0E8;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: var(--white);
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(27, 67, 50, 0.05);
+    }
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 10px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(27, 67, 50, 0.22);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(27, 67, 50, 0.06);
+      margin-bottom: 14px;
+    }
+
+    /* ---- QUIZ ---- */
+    .quiz-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .progress-track {
+      height: 8px;
+      background: #E2ECE6;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary-mid), var(--amber));
+      transition: width 0.25s ease;
+    }
+    .q-badge {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--sage-bg);
+      border: 1px solid var(--border);
+      padding: 2px 9px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+    .q-text {
+      font-size: 1.03rem;
+      font-weight: 700;
+      margin: 0 0 14px;
+      color: var(--ink);
+    }
+    .q-code {
+      display: block;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.88rem;
+      background: var(--sage-bg);
+      border-left: 3.5px solid var(--primary);
+      padding: 8px 11px;
+      border-radius: 6px;
+      margin: 8px 0 12px;
+      color: var(--primary-dark);
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .opt-btn {
+      text-align: left;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 0.94rem;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: all 0.15s ease;
+    }
+    .opt-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: var(--sage-bg);
+    }
+    .opt-key {
+      flex: 0 0 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--sage-bg);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.82rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .opt-btn.correct {
+      border-color: var(--ok);
+      background: var(--ok-bg);
+    }
+    .opt-btn.correct .opt-key { background: var(--ok); color: var(--white); }
+    .opt-btn.wrong {
+      border-color: var(--bad);
+      background: var(--bad-bg);
+    }
+    .opt-btn.wrong .opt-key { background: var(--bad); color: var(--white); }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .feedback.show { display: block; }
+    .feedback.ok {
+      background: var(--ok-bg);
+      border-left: 4px solid var(--ok);
+      color: #14532D;
+    }
+    .feedback.bad {
+      background: var(--terakota-soft);
+      border-left: 4px solid var(--terakota);
+      color: #7C2D12;
+    }
+
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+      gap: 10px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: 9px;
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-primary:hover { background: var(--primary-mid); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-amber {
+      background: var(--amber);
+      color: var(--primary-dark);
+      border: none;
+      border-radius: 9px;
+      padding: 10px 18px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .score-box {
+      text-align: center;
+      padding: 12px 6px;
+    }
+    .score-ring {
+      width: 112px;
+      height: 112px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: var(--sage-bg);
+      border: 6px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .score-num { font-size: 1.85rem; font-weight: 800; color: var(--primary); line-height: 1.05; }
+    .score-sub { font-size: 0.76rem; color: var(--muted); font-weight: 700; }
+
+    /* ---- SIMULATOR MATRIKS 4x4 ---- */
+    .sim-title {
+      margin: 0 0 6px;
+      color: var(--primary);
+      font-size: 1.08rem;
+    }
+    .sim-desc {
+      margin: 0 0 12px;
+      font-size: 0.89rem;
+      color: var(--muted);
+    }
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .preset-btn {
+      background: var(--sage-bg);
+      color: var(--primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .preset-btn:hover {
+      background: var(--amber-soft);
+      border-color: var(--amber);
+    }
+
+    .matrix-wrap {
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+    table.rel-matrix {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 6px;
+      text-align: center;
+    }
+    table.rel-matrix th {
+      background: var(--primary);
+      color: var(--white);
+      padding: 8px 6px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    table.rel-matrix th.corner {
+      background: var(--amber-soft);
+      color: var(--primary);
+      border: 1.5px solid var(--amber);
+      font-size: 0.78rem;
+    }
+    table.rel-matrix th.row-hdr {
+      background: var(--sage-bg);
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+    .cell-btn {
+      width: 100%;
+      min-width: 58px;
+      padding: 11px 6px;
+      border-radius: 9px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.15s ease;
+    }
+    .cell-btn:active { transform: scale(0.95); }
+    .cell-btn.on {
+      background: var(--primary);
+      color: var(--amber);
+      border: 2px solid var(--primary-dark);
+      box-shadow: 0 3px 8px rgba(27, 67, 50, 0.22);
+    }
+    .cell-btn.off {
+      background: #F8FAFC;
+      color: #94A3B8;
+      border: 2px dashed #CBD5E1;
+    }
+
+    .eval-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 600px) {
+      .eval-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .eval-card {
+      border-radius: 11px;
+      padding: 13px 14px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+    }
+    .eval-card.is-true {
+      border-color: var(--ok);
+      background: var(--ok-bg);
+    }
+    .eval-card.is-false {
+      border-color: var(--terakota);
+      background: var(--terakota-soft);
+    }
+    .eval-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+    .eval-formula {
+      font-family: "Times New Roman", Georgia, serif;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .eval-pill {
+      font-size: 0.74rem;
+      font-weight: 800;
+      padding: 2px 9px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+    .eval-card.is-true .eval-pill { background: var(--ok); color: var(--white); }
+    .eval-card.is-false .eval-pill { background: var(--terakota); color: var(--white); }
+    .eval-meaning {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .eval-reason {
+      font-size: 0.84rem;
+      color: var(--ink);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 22px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <a class="back-btn" href="./index.html">&larr; Ke Bab IV (Hukum Logika)</a>
+      <span class="top-meta">Logika Matematika &bull; S1 Ilmu Komputer</span>
+    </div>
+
+    <header class="hero">
+      <div class="hero-top">
+        <span class="pill">BAB V</span>
+        <span class="hero-course">BUKU AJAR LOGIKA MATEMATIKA</span>
+      </div>
+      <h1>Logika Predikat &amp; Simulator Kuantor</h1>
+      <p>Uji pemahaman domain, negasi kuantor, serta eksplorasi langsung matriks kuantor bersarang 4&times;4.</p>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn active" id="tabBtnQuiz" onclick="switchTab('quiz')">Kuis Interaktif (8 Soal)</button>
+      <button class="tab-btn" id="tabBtnSim" onclick="switchTab('sim')">Simulator Matriks Kuantor</button>
+    </nav>
+
+    <!-- TAB 1: KUIS INTERAKTIF -->
+    <section class="tab-panel active" id="panelQuiz">
+      <div class="card" id="quizCard">
+        <div class="quiz-meta">
+          <span id="qCounter">Soal 1 dari 8</span>
+          <span id="qScoreLive">Skor: 0</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="q-badge" id="qTopic">Domain</span>
+        <p class="q-text" id="qText"></p>
+        <code class="q-code" id="qCode" style="display:none;"></code>
+        <div class="options" id="optionsBox"></div>
+        <div class="feedback" id="feedbackBox"></div>
+        <div class="btn-row">
+          <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Soal Berikutnya &rarr;</button>
+        </div>
+      </div>
+
+      <div class="card" id="resultCard" style="display:none;">
+        <div class="score-box">
+          <div class="score-ring">
+            <span class="score-num" id="finalScoreNum">0/8</span>
+            <span class="score-sub" id="finalPct">0%</span>
+          </div>
+          <h2 id="finalTitle" style="margin:0 0 6px;color:var(--primary);">Hasil Evaluasi Bab V</h2>
+          <p id="finalMsg" style="margin:0 0 18px;color:var(--muted);"></p>
+          <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+            <button class="btn-primary" onclick="restartQuiz()">Ulangi Kuis</button>
+            <button class="btn-amber" onclick="switchTab('sim')">Coba Simulator Matriks &rarr;</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SIMULATOR MATRIKS KUANTOR BERSARANG -->
+    <section class="tab-panel" id="panelSim">
+      <div class="card">
+        <h2 class="sim-title">Simulator Matriks Relasi R(x, y) — 4 Mahasiswa &times; 4 Server</h2>
+        <p class="sim-desc">
+          Klik sel mana saja untuk mengubah relasi <strong>R(x, y)</strong> ("mahasiswa <em>x</em> bisa mengakses server <em>y</em>") antara <strong>T (&check;)</strong> dan <strong>F (&cross;)</strong>. Amati bagaimana keempat rumus kuantor bersarang berubah seketika!
+        </p>
+
+        <div class="presets">
+          <button class="preset-btn" onclick="applyPreset('diag')">Preset 1: &forall;x&exists;y Benar, &exists;y&forall;x Salah</button>
+          <button class="preset-btn" onclick="applyPreset('col')">Preset 2: &exists;y&forall;x Benar (Server S2 untuk Semua)</button>
+          <button class="preset-btn" onclick="applyPreset('all')">Preset 3: Semua True (&forall;x&forall;y)</button>
+          <button class="preset-btn" onclick="applyPreset('none')">Preset 4: Kosong Semua</button>
+          <button class="preset-btn" onclick="applyPreset('rand')">Acak Relasi</button>
+        </div>
+
+        <div class="matrix-wrap">
+          <table class="rel-matrix" aria-label="Matriks Relasi Kuantor Bersarang">
+            <thead>
+              <tr>
+                <th class="corner">x \ y</th>
+                <th>S1</th>
+                <th>S2</th>
+                <th>S3</th>
+                <th>S4</th>
+              </tr>
+            </thead>
+            <tbody id="matrixBody"></tbody>
+          </table>
+        </div>
+
+        <div class="eval-grid" id="evalGrid"></div>
+      </div>
+    </section>
+
+    <footer>
+      Lampiran Interaktif Bab V: Logika Predikat &bull; Logika Matematika S1 Ilmu Komputer
+    </footer>
+  </div>
+
+  <script>
+    // =========================================================================
+    // TAB SWITCHER
+    // =========================================================================
+    function switchTab(name) {
+      document.getElementById("tabBtnQuiz").classList.toggle("active", name === "quiz");
+      document.getElementById("tabBtnSim").classList.toggle("active", name === "sim");
+      document.getElementById("panelQuiz").classList.toggle("active", name === "quiz");
+      document.getElementById("panelSim").classList.toggle("active", name === "sim");
+    }
+
+    // =========================================================================
+    // DATA KUIS BAB V (8 SOAL TERVERIFIKASI OLEH verify_logic_bab5.py)
+    // =========================================================================
+    const QUESTIONS = [
+      {
+        topic: "Semesta Pembicaraan (Domain)",
+        text: "Manakah nilai kebenaran pernyataan ∀x (x + 1 > 0) jika dievaluasi pada domain bilangan asli ℕ = {1, 2, 3, …} dan bilangan bulat ℤ?",
+        code: null,
+        options: [
+          "Benar di ℕ, dan Salah di ℤ (counterexample x = -2)",
+          "Benar di ℕ, dan Benar di ℤ",
+          "Salah di ℕ, dan Benar di ℤ",
+          "Salah di kedua domain"
+        ],
+        answer: 0,
+        explain: "Di ℕ = {1, 2, 3, …}, setiap x + 1 ≥ 2 > 0 sehingga Benar. Di ℤ, cukup satu counterexample x = -2 (-2 + 1 = -1 ≯ 0) untuk menggugurkannya."
+      },
+      {
+        topic: "Variabel Bebas vs. Terikat",
+        text: "Pada rumus ∀x (P(x, y) → ∃z Q(x, z)), manakah yang berstatus variabel bebas (free variable)?",
+        code: null,
+        options: [
+          "Hanya x",
+          "Hanya y",
+          "x dan z",
+          "y dan z"
+        ],
+        answer: 1,
+        explain: "x diikat oleh ∀x dan z diikat oleh ∃z. Variabel y tidak berada dalam scope kuantor y mana pun, sehingga y adalah variabel bebas."
+      },
+      {
+        topic: "Jebakan Operator ∀",
+        text: "Dengan domain seluruh mahasiswa kampus (C(x): mahasiswa CS, L(x): wajib ambil Logika), bagaimana translasi tepat kalimat 'Semua mahasiswa CS wajib mengambil Logika'?",
+        code: null,
+        options: [
+          "∀x (C(x) ∧ L(x))",
+          "∀x (C(x) → L(x))",
+          "∃x (C(x) → L(x))",
+          "∀x (L(x) → C(x))"
+        ],
+        answer: 1,
+        explain: "Kuantor universal menyaring himpunan bagian memakai implikasi (→). Memakai ∧ keliru karena akan mengklaim seluruh mahasiswa di kampus adalah mahasiswa CS."
+      },
+      {
+        topic: "Jebakan Operator ∃",
+        text: "Dengan domain seluruh mahasiswa kampus (C(x): mahasiswa CS, J(x): jago C++), bagaimana translasi tepat kalimat 'Ada mahasiswa CS yang jago C++'?",
+        code: null,
+        options: [
+          "∃x (C(x) → J(x))",
+          "∀x (C(x) ∧ J(x))",
+          "∃x (C(x) ∧ J(x))",
+          "∃x (C(x) ∨ J(x))"
+        ],
+        answer: 2,
+        explain: "Kuantor eksistensial memakai konjungsi (∧) agar witness benar-benar memenuhi kedua sifat sekaligus. Memakai → keliru karena bernilai benar otomatis jika ada 1 mahasiswa non-CS."
+      },
+      {
+        topic: "Negasi Kuantor Tunggal",
+        text: "Bentuk negasi yang ekuivalen dari ¬∀x (I(x) ∧ V(x)) adalah …",
+        code: null,
+        options: [
+          "∀x (¬I(x) ∧ ¬V(x))",
+          "∃x (¬I(x) ∧ ¬V(x))",
+          "∃x (¬I(x) ∨ ¬V(x))",
+          "∀x (¬I(x) ∨ ¬V(x))"
+        ],
+        answer: 2,
+        explain: "Dorong ¬ melewati ∀ menjadi ∃, lalu terapkan Hukum De Morgan proposisi pada ¬(I(x) ∧ V(x)) sehingga diperoleh ∃x (¬I(x) ∨ ¬V(x))."
+      },
+      {
+        topic: "Urutan Kuantor Bersarang",
+        text: "Pada domain bilangan bulat ℤ, bandingkan nilai kebenaran P: ∀x ∃y (x + y = 0) dan Q: ∃y ∀x (x + y = 0).",
+        code: null,
+        options: [
+          "P Benar, Q Benar",
+          "P Benar, Q Salah",
+          "P Salah, Q Benar",
+          "P Salah, Q Salah"
+        ],
+        answer: 1,
+        explain: "P Benar karena untuk setiap x ∈ ℤ kita bisa memilih y = -x. Q Salah karena tidak ada satu bilangan y tetap yang menghasilkan 0 saat dijumlahkan dengan semua x."
+      },
+      {
+        topic: "Negasi Kuantor Bersarang",
+        text: "Hasil penyederhanaan dari negasi dua lapis ¬∀x ∃y R(x, y) adalah …",
+        code: null,
+        options: [
+          "∃x ∃y ¬R(x, y)",
+          "∀x ∃y ¬R(x, y)",
+          "∃x ∀y ¬R(x, y)",
+          "∀x ∀y ¬R(x, y)"
+        ],
+        answer: 2,
+        explain: "Setiap kuantor yang dilewati negasi dibalik jenisnya: ¬∀x menjadi ∃x ¬, lalu ¬∃y menjadi ∀y ¬, menghasilkan ∃x ∀y ¬R(x, y)."
+      },
+      {
+        topic: "Implementasi Python all() & any()",
+        text: "Berdasarkan Hukum De Morgan untuk Kuantor, ekspresi Python manakah yang SELALU ekuivalen dengan kode berikut?",
+        code: "not all(lulus(m) for m in kelas)",
+        options: [
+          "all(not lulus(m) for m in kelas)",
+          "any(not lulus(m) for m in kelas)",
+          "not any(lulus(m) for m in kelas)",
+          "any(lulus(m) for m in kelas)"
+        ],
+        answer: 1,
+        explain: "all(...) adalah ∀m dan any(...) adalah ∃m. Karena ¬∀m L(m) ≡ ∃m ¬L(m), maka not all(lulus(m) ...) selalu identik dengan any(not lulus(m) ...)."
+      }
+    ];
+
+    let curIdx = 0;
+    let score = 0;
+    let answered = false;
+
+    function renderQuestion() {
+      const q = QUESTIONS[curIdx];
+      answered = false;
+      document.getElementById("qCounter").textContent = `Soal ${curIdx + 1} dari ${QUESTIONS.length}`;
+      document.getElementById("qScoreLive").textContent = `Skor: ${score}`;
+      document.getElementById("progressFill").style.width = `${(curIdx / QUESTIONS.length) * 100}%`;
+      document.getElementById("qTopic").textContent = q.topic;
+      document.getElementById("qText").textContent = q.text;
+
+      const codeEl = document.getElementById("qCode");
+      if (q.code) {
+        codeEl.textContent = q.code;
+        codeEl.style.display = "block";
+      } else {
+        codeEl.style.display = "none";
+      }
+
+      const optBox = document.getElementById("optionsBox");
+      optBox.innerHTML = "";
+      const keys = ["A", "B", "C", "D"];
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.innerHTML = `<span class="opt-key">${keys[i]}</span><span>${opt}</span>`;
+        btn.onclick = () => selectOption(i);
+        optBox.appendChild(btn);
+      });
+
+      const fb = document.getElementById("feedbackBox");
+      fb.className = "feedback";
+      fb.textContent = "";
+
+      const nextBtn = document.getElementById("nextBtn");
+      nextBtn.disabled = true;
+      nextBtn.textContent = curIdx === QUESTIONS.length - 1 ? "Lihat Skor Akhir" : "Soal Berikutnya →";
+    }
+
+    function selectOption(choice) {
+      if (answered) return;
+      answered = true;
+      const q = QUESTIONS[curIdx];
+      const btns = document.querySelectorAll("#optionsBox .opt-btn");
+      btns.forEach((b, i) => {
+        b.disabled = true;
+        if (i === q.answer) b.classList.add("correct");
+        else if (i === choice) b.classList.add("wrong");
+      });
+
+      const fb = document.getElementById("feedbackBox");
+      if (choice === q.answer) {
+        score++;
+        fb.className = "feedback show ok";
+        fb.innerHTML = `<strong>Benar!</strong> ${q.explain}`;
+      } else {
+        fb.className = "feedback show bad";
+        fb.innerHTML = `<strong>Kurang tepat.</strong> ${q.explain}`;
+      }
+      document.getElementById("qScoreLive").textContent = `Skor: ${score}`;
+      document.getElementById("nextBtn").disabled = false;
+    }
+
+    function nextQuestion() {
+      if (curIdx < QUESTIONS.length - 1) {
+        curIdx++;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById("progressFill").style.width = "100%";
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("resultCard").style.display = "block";
+      const pct = Math.round((score / QUESTIONS.length) * 100);
+      document.getElementById("finalScoreNum").textContent = `${score}/${QUESTIONS.length}`;
+      document.getElementById("finalPct").textContent = `${pct}%`;
+
+      let msg = "Coba ulangi bagian jebakan operator dan negasi kuantor, lalu eksplorasi Simulator Matriks.";
+      if (pct === 100) msg = "Sempurna! Anda menguasai domain, translasi, negasi, hingga kuantor bersarang.";
+      else if (pct >= 75) msg = "Mantap! Pemahaman Logika Predikat Anda sudah kuat—coba uji intuisi di tab Simulator.";
+      document.getElementById("finalMsg").textContent = msg;
+    }
+
+    function restartQuiz() {
+      curIdx = 0;
+      score = 0;
+      document.getElementById("resultCard").style.display = "none";
+      document.getElementById("quizCard").style.display = "block";
+      renderQuestion();
+    }
+
+    // =========================================================================
+    // SIMULATOR MATRIKS KUANTOR BERSARANG 4x4
+    // =========================================================================
+    const ROWS = ["M1", "M2", "M3", "M4"];
+    const COLS = ["S1", "S2", "S3", "S4"];
+
+    // Default: diagonal (∀x∃y True, ∃y∀x False)
+    let grid = [
+      [true, false, false, false],
+      [false, true, false, false],
+      [false, false, true, false],
+      [false, false, false, true]
+    ];
+
+    function applyPreset(kind) {
+      if (kind === "diag") {
+        grid = ROWS.map((_, r) => COLS.map((__, c) => r === c));
+      } else if (kind === "col") {
+        grid = ROWS.map((_, r) => COLS.map((__, c) => c === 1 || (r === 0 && c === 0)));
+      } else if (kind === "all") {
+        grid = ROWS.map(() => COLS.map(() => true));
+      } else if (kind === "none") {
+        grid = ROWS.map(() => COLS.map(() => false));
+      } else if (kind === "rand") {
+        grid = ROWS.map(() => COLS.map(() => Math.random() < 0.48));
+      }
+      renderMatrix();
+    }
+
+    function toggleCell(r, c) {
+      grid[r][c] = !grid[r][c];
+      renderMatrix();
+    }
+
+    function evaluateQuantifiers() {
+      // 1. ∀x ∃y R(x, y)
+      const rowWitnesses = [];
+      let failRow = -1;
+      for (let r = 0; r < 4; r++) {
+        const c = grid[r].findIndex(Boolean);
+        if (c === -1) {
+          failRow = r;
+          break;
+        }
+        rowWitnesses.push(`${ROWS[r]}→${COLS[c]}`);
+      }
+      const q1 = {
+        formula: "∀x ∃y R(x, y)",
+        meaning: "Setiap mahasiswa punya minimal satu server (boleh beda-beda).",
+        ok: failRow === -1,
+        reason: failRow === -1
+          ? `Setiap baris punya witness: ${rowWitnesses.join(", ")}.`
+          : `Counterexample: ${ROWS[failRow]} tidak terhubung ke satu pun server (semua False di baris ${ROWS[failRow]}).`
+      };
+
+      // 2. ∃y ∀x R(x, y)
+      let winCol = -1;
+      for (let c = 0; c < 4; c++) {
+        if (ROWS.every((_, r) => grid[r][c])) {
+          winCol = c;
+          break;
+        }
+      }
+      let colCounterNote = "";
+      if (winCol === -1) {
+        const misses = COLS.map((col, c) => {
+          const rMiss = ROWS.findIndex((_, r) => !grid[r][c]);
+          return `${col} gagal di ${ROWS[rMiss]}`;
+        });
+        colCounterNote = `Tidak ada satu kolom penuh: ${misses.slice(0, 2).join("; ")}, dst.`;
+      }
+      const q2 = {
+        formula: "∃y ∀x R(x, y)",
+        meaning: "Ada satu server tunggal yang bisa diakses seluruh mahasiswa.",
+        ok: winCol !== -1,
+        reason: winCol !== -1
+          ? `Witness tunggal: kolom ${COLS[winCol]} bernilai True untuk seluruh M1–M4.`
+          : colCounterNote
+      };
+
+      // 3. ∀x ∀y R(x, y)
+      let firstFalse = null;
+      for (let r = 0; r < 4 && !firstFalse; r++) {
+        for (let c = 0; c < 4; c++) {
+          if (!grid[r][c]) {
+            firstFalse = [ROWS[r], COLS[c]];
+            break;
+          }
+        }
+      }
+      const q3 = {
+        formula: "∀x ∀y R(x, y)",
+        meaning: "Semua mahasiswa bisa mengakses seluruh server tanpa kecuali.",
+        ok: firstFalse === null,
+        reason: firstFalse === null
+          ? "Seluruh 16 pasangan (x, y) pada matriks bernilai True."
+          : `Counterexample: pasangan (${firstFalse[0]}, ${firstFalse[1]}) bernilai False.`
+      };
+
+      // 4. ∃x ∃y R(x, y)
+      let firstTrue = null;
+      for (let r = 0; r < 4 && !firstTrue; r++) {
+        for (let c = 0; c < 4; c++) {
+          if (grid[r][c]) {
+            firstTrue = [ROWS[r], COLS[c]];
+            break;
+          }
+        }
+      }
+      const q4 = {
+        formula: "∃x ∃y R(x, y)",
+        meaning: "Ada minimal satu pasangan mahasiswa–server yang terhubung.",
+        ok: firstTrue !== null,
+        reason: firstTrue !== null
+          ? `Witness ditemukan: pasangan (${firstTrue[0]}, ${firstTrue[1]}) bernilai True.`
+          : "Seluruh 16 sel matriks bernilai False (tidak ada satu pun witness)."
+      };
+
+      return [q1, q2, q3, q4];
+    }
+
+    function renderMatrix() {
+      const tbody = document.getElementById("matrixBody");
+      tbody.innerHTML = "";
+      ROWS.forEach((rName, r) => {
+        const tr = document.createElement("tr");
+        const th = document.createElement("th");
+        th.className = "row-hdr";
+        th.textContent = rName;
+        tr.appendChild(th);
+
+        COLS.forEach((cName, c) => {
+          const td = document.createElement("td");
+          const btn = document.createElement("button");
+          const isOn = grid[r][c];
+          btn.className = `cell-btn ${isOn ? "on" : "off"}`;
+          btn.textContent = isOn ? "T ✓" : "F ✗";
+          btn.setAttribute("aria-label", `R(${rName}, ${cName}) = ${isOn ? "True" : "False"}`);
+          btn.onclick = () => toggleCell(r, c);
+          td.appendChild(btn);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      const evalGrid = document.getElementById("evalGrid");
+      evalGrid.innerHTML = "";
+      evaluateQuantifiers().forEach(item => {
+        const card = document.createElement("div");
+        card.className = `eval-card ${item.ok ? "is-true" : "is-false"}`;
+        card.innerHTML = `
+          <div class="eval-head">
+            <span class="eval-formula">${item.formula}</span>
+            <span class="eval-pill">${item.ok ? "BENAR" : "SALAH"}</span>
+          </div>
+          <div class="eval-meaning">${item.meaning}</div>
+          <div class="eval-reason">${item.reason}</div>
+        `;
+        evalGrid.appendChild(card);
+      });
+    }
+
+    // Init
+    renderQuestion();
+    renderMatrix();
+  </script>
+</body>
+</html>
